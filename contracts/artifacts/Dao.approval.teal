@@ -23,7 +23,7 @@ abi_route_createApplication:
 createApplication:
 	proto 1 0
 
-	// contracts/dao.algo.ts:8
+	// contracts/dao.algo.ts:12
 	// this.proposal.value = proposal
 	byte "p"
 	frame_dig -1 // proposal: bytes
@@ -36,6 +36,46 @@ createApplication:
 	app_global_put
 	retsub
 
+abi_route_vote:
+	// no dupn needed
+	txna ApplicationArgs 1
+	int 0
+	getbit
+	callsub vote
+	int 1
+	return
+
+vote:
+	proto 1 0
+
+	// contracts/dao.algo.ts:16
+	// this.votesTotal.value = this.votesTotal.value + 1
+	byte "votesTotal"
+	byte "votesTotal"
+	app_global_get
+	int 1
+	+
+	app_global_put
+
+	// if0_condition
+	// contracts/dao.algo.ts:17
+	// inFavor
+	frame_dig -1 // inFavor: bool
+	bz if0_end
+
+	// if0_consequent
+	// contracts/dao.algo.ts:18
+	// this.votesInFavor.value = this.votesInFavor.value + 1
+	byte "votesInFavor"
+	byte "votesInFavor"
+	app_global_get
+	int 1
+	+
+	app_global_put
+
+if0_end:
+	retsub
+
 abi_route_getProposal:
 	// no dupn needed
 	callsub getProposal
@@ -45,7 +85,7 @@ abi_route_getProposal:
 getProposal:
 	proto 0 0
 
-	// contracts/dao.algo.ts:12
+	// contracts/dao.algo.ts:23
 	// return this.proposal.value;
 	byte "p"
 	app_global_get
@@ -62,6 +102,39 @@ getProposal:
 	log
 	retsub
 
+abi_route_getVotes:
+	// no dupn needed
+	callsub getVotes
+	int 1
+	return
+
+getVotes:
+	proto 0 0
+
+	// contracts/dao.algo.ts:27
+	// assert(this.votesTotal.exists)
+	txna Applications 0
+	byte "votesTotal"
+	app_global_get_ex
+	swap
+	pop
+	assert
+
+	// contracts/dao.algo.ts:28
+	// return { votesTotal: this.votesTotal.value, votesInFavor: this.votesInFavor.value };
+	byte "votesTotal"
+	app_global_get
+	itob
+	byte "votesInFavor"
+	app_global_get
+	itob
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
 create_NoOp:
 	method "createApplication(string)void"
 	txna ApplicationArgs 0
@@ -69,7 +142,9 @@ create_NoOp:
 	err
 
 call_NoOp:
+	method "vote(bool)void"
 	method "getProposal()string"
+	method "getVotes()(uint64,uint64)"
 	txna ApplicationArgs 0
-	match abi_route_getProposal
+	match abi_route_vote abi_route_getProposal abi_route_getVotes
 	err
