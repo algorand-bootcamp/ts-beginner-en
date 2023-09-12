@@ -42,6 +42,21 @@
       }
     },
     {
+      "name": "deregister",
+      "args": [
+        {
+          "name": "registeredASA",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
       "name": "vote",
       "args": [
         {
