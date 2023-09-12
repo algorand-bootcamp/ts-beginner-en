@@ -1,7 +1,7 @@
 import {
   describe, test, expect, beforeAll, beforeEach,
 } from '@jest/globals';
-import algosdk, { makeAssetTransferTxnWithSuggestedParams } from 'algosdk';
+import algosdk, {decodeSignedTransaction, makeAssetTransferTxnWithSuggestedParams} from 'algosdk';
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing';
 import { algos, microAlgos, getOrCreateKmdWalletAccount } from '@algorandfoundation/algokit-utils';
 import { DaoClient } from '../contracts/clients/DaoClient';
@@ -15,6 +15,7 @@ describe('Dao', () => {
   let sender: algosdk.Account;
   let other: algosdk.Account;
   const proposal = 'This is a proposal.';
+  const endVoting = 16927981910;
   let registeredASA: bigint;
   beforeEach(fixture.beforeEach);
 
@@ -40,7 +41,7 @@ describe('Dao', () => {
       algod,
     );
 
-    await appClient.create.createApplication({ proposal });
+    await appClient.create.createApplication({ proposal, endVoting });
   }, 15_000);
 
   test('getProposal', async () => {
@@ -124,6 +125,20 @@ describe('Dao', () => {
   });
 
   test('vote & getVotes', async () => {
+    const txns = await appClient
+      .compose()
+      .vote({ inFavor: true, registeredASA }, { sender })
+      .atc()
+      .then((atc) => atc.gatherSignatures());
+    const signedTxns = txns.map((txn) => decodeSignedTransaction(txn));
+    const dryrunRequest = await algosdk.createDryrun({
+      client: algod,
+      txns: signedTxns,
+      latestTimestamp: endVoting,
+    });
+    const dryrunResponse = await algod.dryrun(dryrunRequest).do();
+    expect(dryrunResponse.txns[0]['app-call-messages'][1]).toBe('REJECT');
+
     await appClient.vote({ inFavor: true, registeredASA }, { sender });
 
     const votesAfter = await appClient.getVotes({});
