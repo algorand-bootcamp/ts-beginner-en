@@ -4,8 +4,8 @@ import { Contract } from '@algorandfoundation/tealscript';
 class Dao extends Contract {
   proposal = GlobalStateKey<string>({ key: 'p' });
 
-  createApplication(): void {
-    this.proposal.value = 'This is a proposal.';
+  createApplication(proposal: string): void {
+    this.proposal.value = proposal;
   }
 
   getProposal(): string {
