@@ -1,0 +1,31 @@
+{
+  "name": "Dao",
+  "desc": "",
+  "methods": [
+    {
+      "name": "doMath",
+      "args": [
+        {
+          "name": "a",
+          "type": "uint64",
+          "desc": "The first number"
+        },
+        {
+          "name": "b",
+          "type": "uint64",
+          "desc": "The second number"
+        },
+        {
+          "name": "operation",
+          "type": "string",
+          "desc": "The operation to perform. Can be either 'sum' or 'difference'"
+        }
+      ],
+      "desc": "A method that takes two numbers and does either addition or subtraction",
+      "returns": {
+        "type": "uint64",
+        "desc": "The result of the operation"
+      }
+    }
+  ]
+}
