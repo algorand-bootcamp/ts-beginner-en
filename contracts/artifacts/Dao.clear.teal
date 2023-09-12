@@ -1,2 +1,60 @@
 #pragma version 9
+// contracts/dao.algo.ts:75
+// this.forgetVote()
+// no dupn needed
+callsub forgetVote
 int 1
+return
+
+forgetVote:
+	proto 0 0
+
+	// if3_condition
+	// contracts/dao.algo.ts:52
+	// this.inFavor(this.txn.sender).exists
+	txn Sender
+	txna Applications 0
+	byte "inFavor"
+	app_local_get_ex
+	swap
+	pop
+	bz if3_end
+
+	// if3_consequent
+	// contracts/dao.algo.ts:53
+	// this.votesTotal.value = this.votesTotal.value - 1
+	byte "votesTotal"
+	app_global_get
+	byte "votesTotal"
+	byte "votesTotal"
+	app_global_get
+	int 1
+	-
+	app_global_put
+
+	// if4_condition
+	// contracts/dao.algo.ts:54
+	// this.inFavor(this.txn.sender).value
+	txn Sender
+	byte "inFavor"
+	app_local_get
+	int 0
+	getbit
+	bz if4_end
+
+	// if4_consequent
+	// contracts/dao.algo.ts:55
+	// this.votesInFavor.value = this.votesInFavor.value - 1
+	byte "votesInFavor"
+	app_global_get
+	byte "votesInFavor"
+	byte "votesInFavor"
+	app_global_get
+	int 1
+	-
+	app_global_put
+
+if4_end:
+
+if3_end:
+	retsub
