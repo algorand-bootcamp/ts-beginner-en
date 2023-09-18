@@ -26,6 +26,11 @@ import { SendTransactionResult, TransactionToSign, SendTransactionFrom } from '@
 import { Algodv2, OnApplicationComplete, Transaction, TransactionWithSigner, AtomicTransactionComposer } from 'algosdk'
 export const APP_SPEC: AppSpec = {
   "hints": {
+    "createApplication(string)void": {
+      "call_config": {
+        "no_op": "CREATE"
+      }
+    },
     "getProposal()string": {
       "call_config": {
         "no_op": "CALL"
@@ -33,7 +38,7 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "bare_call_config": {
-    "no_op": "CREATE",
+    "no_op": "NEVER",
     "opt_in": "NEVER",
     "close_out": "NEVER",
     "update_application": "NEVER",
@@ -65,13 +70,28 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDkKCi8vIFRoaXMgVEVBTCB3YXMgZ2VuZXJhdGVkIGJ5IFRFQUxTY3JpcHQgdjAuNDMuMgovLyBodHRwczovL2dpdGh1Yi5jb20vYWxnb3JhbmQtZGV2cmVsL1RFQUxTY3JpcHQKCi8vIFRoaXMgY29udHJhY3QgaXMgY29tcGxpYW50IHdpdGggYW5kL29yIGltcGxlbWVudHMgdGhlIGZvbGxvd2luZyBBUkNzOiBbIEFSQzQgXQoKLy8gVGhlIGZvbGxvd2luZyB0ZW4gbGluZXMgb2YgVEVBTCBoYW5kbGUgaW5pdGlhbCBwcm9ncmFtIGZsb3cKLy8gVGhpcyBwYXR0ZXJuIGlzIHVzZWQgdG8gbWFrZSBpdCBlYXN5IGZvciBhbnlvbmUgdG8gcGFyc2UgdGhlIHN0YXJ0IG9mIHRoZSBwcm9ncmFtIGFuZCBkZXRlcm1pbmUgaWYgYSBzcGVjaWZpYyBhY3Rpb24gaXMgYWxsb3dlZAovLyBIZXJlLCBhY3Rpb24gcmVmZXJzIHRvIHRoZSBPbkNvbXBsZXRlIGluIGNvbWJpbmF0aW9uIHdpdGggd2hldGhlciB0aGUgYXBwIGlzIGJlaW5nIGNyZWF0ZWQgb3IgY2FsbGVkCi8vIEV2ZXJ5IHBvc3NpYmxlIGFjdGlvbiBmb3IgdGhpcyBjb250cmFjdCBpcyByZXByZXNlbnRlZCBpbiB0aGUgc3dpdGNoIHN0YXRlbWVudAovLyBJZiB0aGUgYWN0aW9uIGlzIG5vdCBpbXBsbWVudGVkIGluIHRoZSBjb250cmFjdCwgaXRzIHJlcHNlY3RpdmUgYnJhbmNoIHdpbGwgYmUgIk5PVF9JTVBMTUVOVEVEIiB3aGljaCBqdXN0IGNvbnRhaW5zICJlcnIiCnR4biBBcHBsaWNhdGlvbklECmludCAwCj4KaW50IDYKKgp0eG4gT25Db21wbGV0aW9uCisKc3dpdGNoIGNyZWF0ZV9Ob09wIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgY2FsbF9Ob09wCgpOT1RfSU1QTEVNRU5URUQ6CgllcnIKCi8vIGNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkCmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCS8vIGV4ZWN1dGUgY3JlYXRlQXBwbGljYXRpb24oKXZvaWQKCWNhbGxzdWIgY3JlYXRlQXBwbGljYXRpb24KCWludCAxCglyZXR1cm4KCmNyZWF0ZUFwcGxpY2F0aW9uOgoJcHJvdG8gMCAwCgoJLy8gY29udHJhY3RzL2Rhby5hbGdvLnRzOjgKCS8vIHRoaXMucHJvcG9zYWwudmFsdWUgPSAnVGhpcyBpcyBhIHByb3Bvc2FsLicKCWJ5dGUgInAiCglieXRlICJUaGlzIGlzIGEgcHJvcG9zYWwuIgoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWFwcF9nbG9iYWxfcHV0CglyZXRzdWIKCi8vIGdldFByb3Bvc2FsKClzdHJpbmcKYWJpX3JvdXRlX2dldFByb3Bvc2FsOgoJLy8gZXhlY3V0ZSBnZXRQcm9wb3NhbCgpc3RyaW5nCgljYWxsc3ViIGdldFByb3Bvc2FsCglpbnQgMQoJcmV0dXJuCgpnZXRQcm9wb3NhbDoKCXByb3RvIDAgMAoKCS8vIGNvbnRyYWN0cy9kYW8uYWxnby50czoxMgoJLy8gcmV0dXJuIHRoaXMucHJvcG9zYWwudmFsdWU7CglieXRlICJwIgoJYXBwX2dsb2JhbF9nZXQKCWV4dHJhY3QgMiAwCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgpjcmVhdGVfTm9PcDoKCXR4biBOdW1BcHBBcmdzCglieiBhYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCWVycgoKY2FsbF9Ob09wOgoJbWV0aG9kICJnZXRQcm9wb3NhbCgpc3RyaW5nIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2dldFByb3Bvc2FsCgllcnI=",
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDkKCi8vIFRoaXMgVEVBTCB3YXMgZ2VuZXJhdGVkIGJ5IFRFQUxTY3JpcHQgdjAuNDMuMgovLyBodHRwczovL2dpdGh1Yi5jb20vYWxnb3JhbmQtZGV2cmVsL1RFQUxTY3JpcHQKCi8vIFRoaXMgY29udHJhY3QgaXMgY29tcGxpYW50IHdpdGggYW5kL29yIGltcGxlbWVudHMgdGhlIGZvbGxvd2luZyBBUkNzOiBbIEFSQzQgXQoKLy8gVGhlIGZvbGxvd2luZyB0ZW4gbGluZXMgb2YgVEVBTCBoYW5kbGUgaW5pdGlhbCBwcm9ncmFtIGZsb3cKLy8gVGhpcyBwYXR0ZXJuIGlzIHVzZWQgdG8gbWFrZSBpdCBlYXN5IGZvciBhbnlvbmUgdG8gcGFyc2UgdGhlIHN0YXJ0IG9mIHRoZSBwcm9ncmFtIGFuZCBkZXRlcm1pbmUgaWYgYSBzcGVjaWZpYyBhY3Rpb24gaXMgYWxsb3dlZAovLyBIZXJlLCBhY3Rpb24gcmVmZXJzIHRvIHRoZSBPbkNvbXBsZXRlIGluIGNvbWJpbmF0aW9uIHdpdGggd2hldGhlciB0aGUgYXBwIGlzIGJlaW5nIGNyZWF0ZWQgb3IgY2FsbGVkCi8vIEV2ZXJ5IHBvc3NpYmxlIGFjdGlvbiBmb3IgdGhpcyBjb250cmFjdCBpcyByZXByZXNlbnRlZCBpbiB0aGUgc3dpdGNoIHN0YXRlbWVudAovLyBJZiB0aGUgYWN0aW9uIGlzIG5vdCBpbXBsbWVudGVkIGluIHRoZSBjb250cmFjdCwgaXRzIHJlcHNlY3RpdmUgYnJhbmNoIHdpbGwgYmUgIk5PVF9JTVBMTUVOVEVEIiB3aGljaCBqdXN0IGNvbnRhaW5zICJlcnIiCnR4biBBcHBsaWNhdGlvbklECmludCAwCj4KaW50IDYKKgp0eG4gT25Db21wbGV0aW9uCisKc3dpdGNoIGNyZWF0ZV9Ob09wIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgY2FsbF9Ob09wCgpOT1RfSU1QTEVNRU5URUQ6CgllcnIKCi8vIGNyZWF0ZUFwcGxpY2F0aW9uKHN0cmluZyl2b2lkCmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCS8vIHByb3Bvc2FsOiBzdHJpbmcKCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBjcmVhdGVBcHBsaWNhdGlvbihzdHJpbmcpdm9pZAoJY2FsbHN1YiBjcmVhdGVBcHBsaWNhdGlvbgoJaW50IDEKCXJldHVybgoKY3JlYXRlQXBwbGljYXRpb246Cglwcm90byAxIDAKCgkvLyBjb250cmFjdHMvZGFvLmFsZ28udHM6OAoJLy8gdGhpcy5wcm9wb3NhbC52YWx1ZSA9IHByb3Bvc2FsCglieXRlICJwIgoJZnJhbWVfZGlnIC0xIC8vIHByb3Bvc2FsOiBieXRlcwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWFwcF9nbG9iYWxfcHV0CglyZXRzdWIKCi8vIGdldFByb3Bvc2FsKClzdHJpbmcKYWJpX3JvdXRlX2dldFByb3Bvc2FsOgoJLy8gZXhlY3V0ZSBnZXRQcm9wb3NhbCgpc3RyaW5nCgljYWxsc3ViIGdldFByb3Bvc2FsCglpbnQgMQoJcmV0dXJuCgpnZXRQcm9wb3NhbDoKCXByb3RvIDAgMAoKCS8vIGNvbnRyYWN0cy9kYW8uYWxnby50czoxMgoJLy8gcmV0dXJuIHRoaXMucHJvcG9zYWwudmFsdWU7CglieXRlICJwIgoJYXBwX2dsb2JhbF9nZXQKCWV4dHJhY3QgMiAwCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgpjcmVhdGVfTm9PcDoKCW1ldGhvZCAiY3JlYXRlQXBwbGljYXRpb24oc3RyaW5nKXZvaWQiCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCWVycgoKY2FsbF9Ob09wOgoJbWV0aG9kICJnZXRQcm9wb3NhbCgpc3RyaW5nIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2dldFByb3Bvc2FsCgllcnI=",
     "clear": "I3ByYWdtYSB2ZXJzaW9uIDkKaW50IDE="
   },
   "contract": {
     "name": "Dao",
     "desc": "",
     "methods": [
+      {
+        "name": "createApplication",
+        "args": [
+          {
+            "name": "proposal",
+            "type": "string",
+            "desc": ""
+          }
+        ],
+        "desc": "",
+        "returns": {
+          "type": "void",
+          "desc": ""
+        }
+      },
       {
         "name": "getProposal",
         "args": [],
@@ -140,6 +160,13 @@ export type Dao = {
    * Maps method signatures / names to their argument and return types.
    */
   methods:
+    & Record<'createApplication(string)void' | 'createApplication', {
+      argsObj: {
+        proposal: string
+      }
+      argsTuple: [proposal: string]
+      returns: void
+    }>
     & Record<'getProposal()string' | 'getProposal', {
       argsObj: {
       }
@@ -187,7 +214,7 @@ export type DaoCreateCalls = (typeof DaoCallFactory)['create']
  * Defines supported create methods for this smart contract
  */
 export type DaoCreateCallParams =
-  | (TypedCallParams<undefined> & (OnCompleteNoOp))
+  | (TypedCallParams<'createApplication(string)void'> & (OnCompleteNoOp))
 /**
  * Defines arguments required for the deploy method.
  */
@@ -210,15 +237,16 @@ export abstract class DaoCallFactory {
   static get create() {
     return {
       /**
-       * Constructs a create call for the Dao smart contract using a bare call
+       * Constructs a create call for the Dao smart contract using the createApplication(string)void ABI method
        *
-       * @param params Any parameters for the call
+       * @param args Any args for the contract call
+       * @param params Any additional parameters for the call
        * @returns A TypedCallParams object for the call
        */
-      bare(params: BareCallArgs & AppClientCallCoreParams & CoreAppCallArgs & AppClientCompilationParams & (OnCompleteNoOp) = {}) {
+      createApplication(args: MethodArgs<'createApplication(string)void'>, params: AppClientCallCoreParams & CoreAppCallArgs & AppClientCompilationParams & (OnCompleteNoOp) = {}) {
         return {
-          method: undefined,
-          methodArgs: undefined,
+          method: 'createApplication(string)void' as const,
+          methodArgs: Array.isArray(args) ? args : [args.proposal],
           ...params,
         }
       },
@@ -316,13 +344,14 @@ export class DaoClient {
     const $this = this
     return {
       /**
-       * Creates a new instance of the Dao smart contract using a bare call.
+       * Creates a new instance of the Dao smart contract using the createApplication(string)void ABI method.
        *
-       * @param args The arguments for the bare call
+       * @param args The arguments for the smart contract call
+       * @param params Any additional parameters for the call
        * @returns The create result
        */
-      bare(args: BareCallArgs & AppClientCallCoreParams & AppClientCompilationParams & CoreAppCallArgs & (OnCompleteNoOp) = {}): Promise<AppCallTransactionResultOfType<undefined>> {
-        return $this.appClient.create(args) as unknown as Promise<AppCallTransactionResultOfType<undefined>>
+      async createApplication(args: MethodArgs<'createApplication(string)void'>, params: AppClientCallCoreParams & AppClientCompilationParams & (OnCompleteNoOp) = {}): Promise<AppCallTransactionResultOfType<MethodReturn<'createApplication(string)void'>>> {
+        return $this.mapReturnValue(await $this.appClient.create(DaoCallFactory.create.createApplication(args, params)))
       },
     }
   }

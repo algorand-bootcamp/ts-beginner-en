@@ -3,6 +3,21 @@
   "desc": "",
   "methods": [
     {
+      "name": "createApplication",
+      "args": [
+        {
+          "name": "proposal",
+          "type": "string",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
       "name": "getProposal",
       "args": [],
       "desc": "",
