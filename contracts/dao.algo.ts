@@ -10,7 +10,7 @@ class Dao extends Contract {
 
   votesInFavor = GlobalStateKey<number>();
 
-  hasVoted = LocalStateKey<boolean>();
+  inFavor = LocalStateKey<boolean>();
 
   createApplication(proposal: string): void {
     this.proposal.value = proposal;
@@ -23,6 +23,7 @@ class Dao extends Contract {
       configAssetTotal: 1_000,
       configAssetDecimals: 0,
       configAssetFreeze: this.app.address,
+      configAssetClawback: this.app.address,
       fee: 0,
     });
     this.registeredAsaId.value = registeredAsa;
@@ -33,7 +34,6 @@ class Dao extends Contract {
   // eslint-disable-next-line no-unused-vars
   register(registeredASA: Asset): void {
     assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 0);
-    this.hasVoted(this.txn.sender).value = false;
     sendAssetTransfer({
       xferAsset: this.registeredAsaId.value,
       assetReceiver: this.txn.sender,
@@ -48,11 +48,38 @@ class Dao extends Contract {
     });
   }
 
+  private forgetVote(): void {
+    if (this.inFavor(this.txn.sender).exists) {
+      this.votesTotal.value = this.votesTotal.value - 1;
+      if (this.inFavor(this.txn.sender).value) {
+        this.votesInFavor.value = this.votesInFavor.value - 1;
+      }
+    }
+  }
+
+  @allow.call('CloseOut')
+  // eslint-disable-next-line no-unused-vars
+  deregister(registeredASA: Asset): void {
+    assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 1);
+    sendAssetTransfer({
+      xferAsset: this.registeredAsaId.value,
+      assetSender: this.txn.sender,
+      assetReceiver: this.app.address,
+      assetAmount: 1,
+      fee: 0,
+    });
+    this.forgetVote();
+  }
+
+  clearState(): void {
+    this.forgetVote();
+  }
+
   // eslint-disable-next-line no-unused-vars
   vote(inFavor: boolean, registeredASA: Asset): void {
     assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 1);
-    assert(!this.hasVoted(this.txn.sender).value);
-    this.hasVoted(this.txn.sender).value = true;
+    assert(!this.inFavor(this.txn.sender).exists);
+    this.inFavor(this.txn.sender).value = inFavor;
     this.votesTotal.value = this.votesTotal.value + 1;
     if (inFavor) {
       this.votesInFavor.value = this.votesInFavor.value + 1;
