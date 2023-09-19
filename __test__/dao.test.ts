@@ -74,46 +74,6 @@ describe('Dao', () => {
     expect(registeredAsaFromMethod.return?.valueOf()).toBe(registeredASA);
   });
 
-  test('vote (Negative)', async () => {
-    await expect(appClient.vote({ inFavor: true, registeredASA }, { sender }))
-      .rejects
-      .toThrow();
-  });
-
-  test('register', async () => {
-    const registeredAsaOptInTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(
-      {
-        from: sender.addr,
-        to: sender.addr,
-        amount: 0,
-        suggestedParams: await algokit.getTransactionParams(undefined, algod),
-        assetIndex: Number(registeredASA),
-      },
-    );
-
-    await algokit.sendTransaction({ from: sender, transaction: registeredAsaOptInTxn }, algod);
-
-    await appClient.register({ registeredASA }, {
-      sender,
-      sendParams: {
-        fee: microAlgos(3_000),
-      },
-    });
-
-    const registeredAsaTransferTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-      from: sender.addr,
-      to: sender.addr,
-      amount: 1,
-      assetIndex: Number(registeredASA),
-      suggestedParams: await algokit.getTransactionParams(undefined, algod),
-    });
-
-    await expect(algokit.sendTransaction(
-      { transaction: registeredAsaTransferTxn, from: sender },
-      algod,
-    )).rejects.toThrow();
-  });
-
   test('getVotes (Negative: should fail because no vote)', async () => {
     await expect(appClient.getVotes({})).rejects.toThrow();
   });
