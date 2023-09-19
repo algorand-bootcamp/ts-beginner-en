@@ -2,6 +2,7 @@ import {
   describe, test, expect, beforeAll, beforeEach,
 } from '@jest/globals';
 import algosdk from 'algosdk';
+import * as algokit from '@algorandfoundation/algokit-utils';
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing';
 import { DaoClient } from '../contracts/clients/DaoClient';
 
@@ -15,7 +16,6 @@ describe('Dao', () => {
   beforeAll(async () => {
     await fixture.beforeEach();
     const { algod, testAccount } = fixture.context;
-    const sender = algosdk.generateAccount();
 
     appClient = new DaoClient(
       {
