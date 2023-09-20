@@ -32,13 +32,11 @@ class Dao extends Contract {
       xferAsset: this.registeredAsaId.value,
       assetReceiver: this.txn.sender,
       assetAmount: 1,
-      fee: 0,
     });
     sendAssetFreeze({
       freezeAsset: this.registeredAsaId.value,
       freezeAssetAccount: this.txn.sender,
       freezeAssetFrozen: true,
-      fee: 0,
     });
   }
 
