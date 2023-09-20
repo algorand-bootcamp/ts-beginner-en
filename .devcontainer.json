@@ -1,6 +1,6 @@
 {
     "image": "mcr.microsoft.com/devcontainers/python:3",
-    "onCreateCommand": "pipx install algokit && algokit localnet start",
+    "postCreateCommand": "pipx install algokit",
     "postStartCommand": "algokit localnet start",
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2.5.0": {
