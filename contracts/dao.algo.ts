@@ -19,9 +19,7 @@ class Dao extends Contract {
     assert(!this.registeredAsaId.exists);
     const registeredAsa = sendAssetCreation({
       configAssetTotal: 1_000,
-      configAssetDecimals: 0,
       configAssetFreeze: this.app.address,
-      fee: 0,
     });
     this.registeredAsaId.value = registeredAsa;
     return registeredAsa;
