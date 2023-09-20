@@ -1,5 +1,5 @@
 {
     "image": "mcr.microsoft.com/vscode/devcontainers/universal:1-linux",
-    "onCreateCommand": "pipx install algokit",
+    "postCreateCommand": "pipx install algokit",
     "postStartCommand": "algokit localnet start"
 }
