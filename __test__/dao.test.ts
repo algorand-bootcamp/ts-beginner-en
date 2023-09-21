@@ -35,10 +35,6 @@ describe('Dao', () => {
     expect(proposalFromMethod.return?.valueOf()).toBe(proposal);
   });
 
-  test('getVotes (Negative: should fail because no vote)', async () => {
-    await expect(appClient.getVotes({})).rejects.toThrow();
-  });
-
   test('vote & getVotes', async () => {
     await appClient.vote({ inFavor: true });
 

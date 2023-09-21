@@ -23,8 +23,7 @@ class Dao extends Contract {
     return this.proposal.value;
   }
 
-  getVotes(): { votesTotal: number, votesInFavor: number } {
-    assert(this.votesTotal.exists);
-    return { votesTotal: this.votesTotal.value, votesInFavor: this.votesInFavor.value };
+  getVotes(): [number, number] {
+    return [this.votesInFavor.value, this.votesTotal.value];
   }
 }
