@@ -1,4 +1,5 @@
 import { Contract } from '@algorandfoundation/tealscript';
+import { verify } from 'crypto';
 
 // eslint-disable-next-line no-unused-vars
 class Dao extends Contract {
@@ -15,7 +16,7 @@ class Dao extends Contract {
   }
 
   bootstrap(): Asset {
-    assert(this.txn.sender === this.app.creator);
+    verifyTxn(this.txn, { sender: this.app.creator });
     assert(!this.registeredAsaId.exists);
     const registeredAsa = sendAssetCreation({
       configAssetTotal: 1_000,
