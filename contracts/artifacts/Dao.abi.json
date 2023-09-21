@@ -18,6 +18,15 @@
       }
     },
     {
+      "name": "bootstrap",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "uint64",
+        "desc": ""
+      }
+    },
+    {
       "name": "vote",
       "args": [
         {
@@ -38,6 +47,15 @@
       "desc": "",
       "returns": {
         "type": "string",
+        "desc": ""
+      }
+    },
+    {
+      "name": "getRegisteredASA",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "uint64",
         "desc": ""
       }
     },
