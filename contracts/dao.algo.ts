@@ -1,5 +1,4 @@
 import { Contract } from '@algorandfoundation/tealscript';
-import { verify } from 'crypto';
 
 // eslint-disable-next-line no-unused-vars
 class Dao extends Contract {
