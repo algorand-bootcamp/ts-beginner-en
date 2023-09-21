@@ -16,3 +16,7 @@ To go to each step, run the command `git checkout vXXX` with `XXX` corresponding
 6. v106
 
 It is recommended to start with step `v101`, so get started with `git checkout v101`
+
+# Local Devcontainer
+
+If you wish to clone the repo locally but still use a devcontainer, simply replace [.devcontainer.json](.devcontainer.json) with [.devcontainer.local.json](.devcontainer.local.json)
