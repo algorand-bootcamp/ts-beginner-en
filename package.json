@@ -1,0 +1,31 @@
+{
+  "name": "ts-dao-beginner-bootcamp",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "generate-client": "algokitgen generate -a contracts/artifacts/Dao.json -o contracts/clients/DaoClient.ts",
+    "compile-contract": "tealscript contracts/dao.algo.ts contracts/artifacts",
+    "build": "npm run compile-contract && npm run generate-client",
+    "test": "npm run build && jest",
+    "lint": "eslint . --ext .ts",
+    "fix": "eslint . --ext .ts --fix"
+  },
+  "dependencies": {
+    "@algorandfoundation/algokit-utils": "^2.2.0",
+    "algosdk": "^2.4.0"
+  },
+  "devDependencies": {
+    "@algorandfoundation/algokit-client-generator": "^2.2.1",
+    "@algorandfoundation/tealscript": "^0.43.2",
+    "@jest/globals": "^29.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "5.0.2"
+  }
+}

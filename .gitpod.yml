@@ -1,0 +1,29 @@
+tasks:
+  - name: algokit localnet
+    command: gp sync-await algokit-install && algokit localnet start && exit
+  - name: install algokit
+    command: > 
+      pip install pipx && 
+      pipx install algokit &&
+      gp sync-done algokit-install  &&
+      exit
+ports:
+  - name: algod
+    port: 4001
+    visibility: public
+    onOpen: ignore
+  - name: indexer
+    port: 8980
+    visibility: public
+    onOpen: ignore
+  - name: postgres
+    port: 5432
+    onOpen: ignore
+  - name: kmd
+    port: 4002
+    visibility: public
+    onOpen: ignore
+  - name: debug port
+    port: 9392
+    onOpen: ignore
+    visibility: public
