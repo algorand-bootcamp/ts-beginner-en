@@ -1,5 +1,5 @@
 import {
-  describe, test, expect, beforeAll, beforeEach
+  describe, test, expect, beforeAll, beforeEach,
 } from '@jest/globals';
 import * as algokit from '@algorandfoundation/algokit-utils';
 import algosdk from 'algosdk';
@@ -27,7 +27,7 @@ describe('Dao', () => {
       algod,
     );
 
-    await appClient.create.bare();
+    await appClient.create.createApplication({});
   });
 
   test('sum', async () => {
