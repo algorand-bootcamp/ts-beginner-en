@@ -36,7 +36,7 @@ abi_route_createApplication:
 createApplication:
 	proto 1 0
 
-	// contracts/dao.algo.ts:8
+	// contracts/dao.algo.ts:12
 	// this.proposal.value = proposal
 	byte "proposal"
 	frame_dig -1 // proposal: bytes
@@ -49,6 +49,49 @@ createApplication:
 	app_global_put
 	retsub
 
+// vote(bool)void
+abi_route_vote:
+	// inFavor: bool
+	txna ApplicationArgs 1
+	int 0
+	getbit
+
+	// execute vote(bool)void
+	callsub vote
+	int 1
+	return
+
+vote:
+	proto 1 0
+
+	// contracts/dao.algo.ts:16
+	// this.votesTotal.value = this.votesTotal.value + 1
+	byte "votesTotal"
+	byte "votesTotal"
+	app_global_get
+	int 1
+	+
+	app_global_put
+
+	// if0_condition
+	// contracts/dao.algo.ts:17
+	// inFavor
+	frame_dig -1 // inFavor: bool
+	bz if0_end
+
+	// if0_consequent
+	// contracts/dao.algo.ts:18
+	// this.votesInFavor.value = this.votesInFavor.value + 1
+	byte "votesInFavor"
+	byte "votesInFavor"
+	app_global_get
+	int 1
+	+
+	app_global_put
+
+if0_end:
+	retsub
+
 // getProposal()string
 abi_route_getProposal:
 	// execute getProposal()string
@@ -59,7 +102,7 @@ abi_route_getProposal:
 getProposal:
 	proto 0 0
 
-	// contracts/dao.algo.ts:12
+	// contracts/dao.algo.ts:23
 	// return this.proposal.value;
 	byte "proposal"
 	app_global_get
@@ -76,6 +119,37 @@ getProposal:
 	log
 	retsub
 
+// getVotes()(uint64,uint64)
+abi_route_getVotes:
+	// execute getVotes()(uint64,uint64)
+	callsub getVotes
+	int 1
+	return
+
+getVotes:
+	proto 0 0
+
+	// contracts/dao.algo.ts:27
+	// return [this.votesInFavor.value, this.votesTotal.value];
+	byte 0x // initial head
+	byte 0x // initial tail
+	byte 0x0010 // initial head offset
+	byte "votesInFavor"
+	app_global_get
+	itob
+	callsub process_static_tuple_element
+	byte "votesTotal"
+	app_global_get
+	itob
+	callsub process_static_tuple_element
+	pop // pop head offset
+	concat // concat head and tail
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
 create_NoOp:
 	method "createApplication(string)void"
 	txna ApplicationArgs 0
@@ -83,7 +157,18 @@ create_NoOp:
 	err
 
 call_NoOp:
+	method "vote(bool)void"
 	method "getProposal()string"
+	method "getVotes()(uint64,uint64)"
 	txna ApplicationArgs 0
-	match abi_route_getProposal
+	match abi_route_vote abi_route_getProposal abi_route_getVotes
 	err
+
+process_static_tuple_element:
+	proto 4 3
+	frame_dig -4 // tuple head
+	frame_dig -1 // element
+	concat
+	frame_dig -3 // tuple tail
+	frame_dig -2 // head offset
+	retsub
