@@ -11,6 +11,7 @@ const fixture = algorandFixture();
 let appClient: DaoClient;
 
 describe('Dao', () => {
+  const proposal = 'This is a proposal.';
   beforeEach(fixture.beforeEach);
 
   beforeAll(async () => {
@@ -26,11 +27,11 @@ describe('Dao', () => {
       algod,
     );
 
-    await appClient.create.createApplication({});
+    await appClient.create.createApplication({ proposal });
   });
 
   test('getProposal', async () => {
     const proposalFromMethod = await appClient.getProposal({});
-    expect(proposalFromMethod.return?.valueOf()).toBe('This is a proposal.');
+    expect(proposalFromMethod.return?.valueOf()).toBe(proposal);
   });
 });
