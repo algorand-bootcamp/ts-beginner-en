@@ -27,11 +27,31 @@
       }
     },
     {
+      "name": "register",
+      "args": [
+        {
+          "name": "registeredASA",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
       "name": "vote",
       "args": [
         {
           "name": "inFavor",
           "type": "bool",
+          "desc": ""
+        },
+        {
+          "name": "registeredASA",
+          "type": "asset",
           "desc": ""
         }
       ],
