@@ -4,7 +4,7 @@ import { PeraWalletConnect } from '@perawallet/connect'
 import { PROVIDER_ID, ProvidersArray, WalletProvider, useInitializeProviders, useWallet } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { SnackbarProvider } from 'notistack'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ConnectWallet from './components/ConnectWallet'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 import { DaoClient } from './contracts/DaoClient'
@@ -40,6 +40,27 @@ if (import.meta.env.VITE_ALGOD_NETWORK === '') {
 export default function App() {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [appID, setAppID] = useState<number>(0)
+  const [proposal, setProposal] = useState<string>('')
+
+  const getProposal = async () => {
+    try {
+      const state = await typedClient.getGlobalState()
+      setProposal(state.proposal!.asString())
+    } catch (e) {
+      console.warn(e)
+      setProposal('Invalid App ID!')
+    }
+  }
+
+  useEffect(() => {
+    if (appID === 0) {
+      setProposal('The app ID must be set manually or via DAO creation before loading the proposal')
+      return
+    }
+
+    getProposal()
+  }, [appID])
+
   const { activeAddress } = useWallet()
 
   const toggleWalletModal = () => {
@@ -99,6 +120,10 @@ export default function App() {
                   value={appID}
                   onChange={(e) => setAppID(e.currentTarget.valueAsNumber || 0)}
                 />
+
+                <h1 className="font-bold m-2">DAO Proposal</h1>
+
+                <textarea className="textarea textarea-bordered m-2" value={proposal} />
 
                 <div className="divider" />
 
