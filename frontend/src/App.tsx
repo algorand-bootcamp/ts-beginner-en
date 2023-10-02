@@ -6,8 +6,10 @@ import algosdk from 'algosdk'
 import { SnackbarProvider } from 'notistack'
 import { useState } from 'react'
 import ConnectWallet from './components/ConnectWallet'
-import Transact from './components/Transact'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
+import { DaoClient } from './contracts/DaoClient'
+import * as algokit from '@algorandfoundation/algokit-utils'
+import DaoCreateApplication from './components/DaoCreateApplication'
 
 let providersArray: ProvidersArray
 if (import.meta.env.VITE_ALGOD_NETWORK === '') {
@@ -37,18 +39,27 @@ if (import.meta.env.VITE_ALGOD_NETWORK === '') {
 
 export default function App() {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
-  const [openDemoModal, setOpenDemoModal] = useState<boolean>(false)
   const { activeAddress } = useWallet()
 
   const toggleWalletModal = () => {
     setOpenWalletModal(!openWalletModal)
   }
 
-  const toggleDemoModal = () => {
-    setOpenDemoModal(!openDemoModal)
-  }
-
   const algodConfig = getAlgodConfigFromViteEnvironment()
+
+  const algodClient = algokit.getAlgoClient({
+    server: algodConfig.server,
+    port: algodConfig.port,
+    token: algodConfig.token,
+  })
+
+  const typedClient = new DaoClient(
+    {
+      resolveBy: 'id',
+      id: 0,
+    },
+    algodClient,
+  )
 
   const walletProviders = useInitializeProviders({
     providers: providersArray,
@@ -90,14 +101,17 @@ export default function App() {
                 </button>
 
                 {activeAddress && (
-                  <button data-test-id="transactions-demo" className="btn m-2" onClick={toggleDemoModal}>
-                    Transactions Demo
-                  </button>
+                  <DaoCreateApplication
+                    buttonClass="btn m-2"
+                    buttonLoadingNode={<span className="loading loading-spinner" />}
+                    buttonNode="Call createApplication"
+                    typedClient={typedClient}
+                    proposal="This is a proposal."
+                  />
                 )}
               </div>
 
               <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
-              <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
             </div>
           </div>
         </div>
