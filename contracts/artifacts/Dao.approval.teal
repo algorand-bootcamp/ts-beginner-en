@@ -22,121 +22,55 @@ switch create_NoOp NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENT
 NOT_IMPLEMENTED:
 	err
 
-getSum:
-	proto 2 1
-
-	// contracts/dao.algo.ts:13
-	// return a + b;
-	frame_dig -1 // a: uint64
-	frame_dig -2 // b: uint64
-	+
-	retsub
-
-getDifference:
-	proto 2 1
-
-	// contracts/dao.algo.ts:24
-	// return a >= b ? a - b : b - a;
-	frame_dig -1 // a: uint64
-	frame_dig -2 // b: uint64
-	>=
-	bz ternary0_false
-	frame_dig -1 // a: uint64
-	frame_dig -2 // b: uint64
-	-
-	b ternary0_end
-
-ternary0_false:
-	frame_dig -2 // b: uint64
-	frame_dig -1 // a: uint64
-	-
-
-ternary0_end:
-	retsub
-
-// doMath(string,uint64,uint64)uint64
-//
-// A method that takes two numbers and does either addition or subtraction
-// 
-// @param a The first number
-// @param b The second number
-// @param operation The operation to perform. Can be either 'sum' or 'difference'
-// 
-// @returns The result of the operation
-abi_route_doMath:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-
-	// operation: string
-	txna ApplicationArgs 3
-	extract 2 0
-
-	// b: uint64
-	txna ApplicationArgs 2
-	btoi
-
-	// a: uint64
-	txna ApplicationArgs 1
-	btoi
-
-	// execute doMath(string,uint64,uint64)uint64
-	callsub doMath
+// createApplication()void
+abi_route_createApplication:
+	// execute createApplication()void
+	callsub createApplication
 	int 1
 	return
 
-doMath:
-	proto 4 0
+createApplication:
+	proto 0 0
 
-	// if0_condition
-	// contracts/dao.algo.ts:39
-	// operation === 'sum'
-	frame_dig -3 // operation: bytes
-	byte "sum"
-	==
-	bz if0_elseif1_condition
-
-	// if0_consequent
-	// contracts/dao.algo.ts:40
-	// result = this.getSum(a, b)
-	frame_dig -2 // b: uint64
-	frame_dig -1 // a: uint64
-	callsub getSum
-	frame_bury -4 // result: uint64
-	b if0_end
-
-if0_elseif1_condition:
-	// contracts/dao.algo.ts:41
-	// operation === 'difference'
-	frame_dig -3 // operation: bytes
-	byte "difference"
-	==
-	bz if0_else
-
-	// if0_elseif1_consequent
-	// contracts/dao.algo.ts:42
-	// result = this.getDifference(a, b)
-	frame_dig -2 // b: uint64
-	frame_dig -1 // a: uint64
-	callsub getDifference
-	frame_bury -4 // result: uint64
-	b if0_end
-
-if0_else:
-	err // 'Invalid operation'
-
-if0_end:
-	// contracts/dao.algo.ts:45
-	// return result;
-	frame_dig -4 // result: uint64
+	// contracts/dao.algo.ts:8
+	// this.proposal.value = 'This is a proposal.'
+	byte "proposal"
+	byte "This is a proposal."
+	dup
+	len
 	itob
+	extract 6 2
+	swap
+	concat
+	app_global_put
+	retsub
+
+// getProposal()string
+abi_route_getProposal:
+	// execute getProposal()string
+	callsub getProposal
+	int 1
+	return
+
+getProposal:
+	proto 0 0
+
+	// contracts/dao.algo.ts:12
+	// return this.proposal.value;
+	byte "proposal"
+	app_global_get
+	extract 2 0
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
 	byte 0x151f7c75
 	swap
 	concat
 	log
 	retsub
-
-abi_route_createApplication:
-	int 1
-	return
 
 create_NoOp:
 	method "createApplication()void"
@@ -145,7 +79,7 @@ create_NoOp:
 	err
 
 call_NoOp:
-	method "doMath(uint64,uint64,string)uint64"
+	method "getProposal()string"
 	txna ApplicationArgs 0
-	match abi_route_doMath
+	match abi_route_getProposal
 	err
