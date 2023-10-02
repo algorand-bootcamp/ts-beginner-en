@@ -5,7 +5,7 @@
   "scripts": {
     "generate-client": "algokitgen generate -a contracts/artifacts/Dao.json -o contracts/clients/DaoClient.ts",
     "compile-contract": "tealscript contracts/dao.algo.ts contracts/artifacts",
-    "generate-components": "algokit-generate-component contracts/artifacts/{{ camel_case_name }}.json contracts/artifacts/components",
+    "generate-components": "algokit-generate-component contracts/artifacts/Dao.json contracts/artifacts/components",
     "build": "npm run compile-contract && npm run generate-client",
     "test": "npm run build && jest",
     "lint": "eslint . --ext .ts",
@@ -19,6 +19,7 @@
     "@algorandfoundation/algokit-client-generator": "^2.2.1",
     "@algorandfoundation/tealscript": "^0.44.0",
     "@jest/globals": "^29.5.0",
+    "@joe-p/algokit-generate-component": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^7.32.0 || ^8.2.0",
