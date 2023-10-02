@@ -4,7 +4,13 @@
   "methods": [
     {
       "name": "createApplication",
-      "args": [],
+      "args": [
+        {
+          "name": "proposal",
+          "type": "string",
+          "desc": ""
+        }
+      ],
       "desc": "",
       "returns": {
         "type": "void",
