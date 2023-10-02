@@ -1,0 +1,16 @@
+{
+    "forwardPorts": [4001, 4002, 8980],
+    "portsAttributes": {
+        "4001": {
+          "label": "algod"
+        },
+        "4002": {
+          "label": "kmd"
+        },
+        "8980": {
+          "label": "indexer"
+        }
+    },
+    "postCreateCommand": "pipx install git+https://github.com/joe-p/algokit-cli@codespaces",
+    "postStartCommand": "algokit localnet start"
+}
