@@ -12,18 +12,18 @@ import { useWallet } from '@txnlab/use-wallet'
   proposal={proposal}
 />
 */
-type DaoCreateApplicationArgs = Dao['methods']['createApplication(string)void']['argsObj']
 
 type Props = {
   buttonClass: string
   buttonLoadingNode?: ReactNode
   buttonNode: ReactNode
   typedClient: DaoClient
-  proposal: DaoCreateApplicationArgs['proposal']
 }
 
 const DaoCreateApplication = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [proposal, setProposal] = useState<string>('')
+
   const { activeAddress, signer } = useWallet()
   const sender = { signer, addr: activeAddress! }
 
@@ -32,7 +32,7 @@ const DaoCreateApplication = (props: Props) => {
     console.log(`Calling createApplication`)
     await props.typedClient.create.createApplication(
       {
-        proposal: props.proposal,
+        proposal,
       },
       { sender },
     )
@@ -40,9 +40,12 @@ const DaoCreateApplication = (props: Props) => {
   }
 
   return (
-    <button className={props.buttonClass} onClick={callMethod}>
-      {loading ? props.buttonLoadingNode || props.buttonNode : props.buttonNode}
-    </button>
+    <div>
+      <input type="text" className="input input-bordered m-2" onChange={(e) => setProposal(e.currentTarget.value)} />
+      <button className={props.buttonClass} onClick={callMethod}>
+        {loading ? props.buttonLoadingNode || props.buttonNode : props.buttonNode}
+      </button>
+    </div>
   )
 }
 

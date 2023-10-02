@@ -96,7 +96,6 @@ export default function App() {
                     buttonLoadingNode={<span className="loading loading-spinner" />}
                     buttonNode="Create DAO"
                     typedClient={typedClient}
-                    proposal="This is a proposal."
                   />
                 )}
               </div>
