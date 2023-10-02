@@ -1,0 +1,92 @@
+{
+  "name": "Dao",
+  "desc": "",
+  "methods": [
+    {
+      "name": "createApplication",
+      "args": [
+        {
+          "name": "proposal",
+          "type": "string",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "bootstrap",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "uint64",
+        "desc": ""
+      }
+    },
+    {
+      "name": "register",
+      "args": [
+        {
+          "name": "registeredASA",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "vote",
+      "args": [
+        {
+          "name": "inFavor",
+          "type": "bool",
+          "desc": ""
+        },
+        {
+          "name": "registeredASA",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "getProposal",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "string",
+        "desc": ""
+      }
+    },
+    {
+      "name": "getRegisteredASA",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "uint64",
+        "desc": ""
+      }
+    },
+    {
+      "name": "getVotes",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "(uint64,uint64)",
+        "desc": ""
+      }
+    }
+  ]
+}
