@@ -39,6 +39,7 @@ if (import.meta.env.VITE_ALGOD_NETWORK === '') {
 
 export default function App() {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
+  const [appID, setAppID] = useState<number>(0)
   const { activeAddress } = useWallet()
 
   const toggleWalletModal = () => {
@@ -56,7 +57,7 @@ export default function App() {
   const typedClient = new DaoClient(
     {
       resolveBy: 'id',
-      id: 0,
+      id: appID,
     },
     algodClient,
   )
@@ -90,12 +91,24 @@ export default function App() {
 
                 <div className="divider" />
 
-                {activeAddress && (
+                <h1 className="font-bold m-2">DAO App ID</h1>
+
+                <input
+                  type="number"
+                  className="input input-bordered m-2"
+                  value={appID}
+                  onChange={(e) => setAppID(e.currentTarget.valueAsNumber || 0)}
+                />
+
+                <div className="divider" />
+
+                {activeAddress && appID === 0 && (
                   <DaoCreateApplication
                     buttonClass="btn m-2"
                     buttonLoadingNode={<span className="loading loading-spinner" />}
                     buttonNode="Create DAO"
                     typedClient={typedClient}
+                    setAppID={setAppID}
                   />
                 )}
               </div>
