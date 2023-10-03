@@ -20,3 +20,10 @@ It is recommended to start with step `v101`, so get started with `git checkout v
 # Local Devcontainer
 
 If you wish to clone the repo locally but still use a devcontainer, simply replace [.devcontainer.json](.devcontainer.json) with [.devcontainer.local.json](.devcontainer.local.json)
+
+
+## Video Recordings
+- Episode #1 [AlgoKit – your window into Web3 using TEALScript](https://youtu.be/jMrCtkwlw_M)
+- Episode #2 [Implementing DAO smart contract logic using TEALScript](https://youtu.be/J1NYgKdmXHw)
+- Episode #3 [Interactions: Frontend Development w/ React]
+- Episode #4 [Test & Debug]
