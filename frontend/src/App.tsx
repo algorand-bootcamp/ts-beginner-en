@@ -10,6 +10,8 @@ import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } fr
 import { DaoClient } from './contracts/DaoClient'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import DaoCreateApplication from './components/DaoCreateApplication'
+import DaoRegister from './components/DaoRegister'
+import DaoVote from './components/DaoVote'
 
 let providersArray: ProvidersArray
 if (import.meta.env.VITE_ALGOD_NETWORK === '') {
@@ -41,24 +43,38 @@ export default function App() {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [appID, setAppID] = useState<number>(0)
   const [proposal, setProposal] = useState<string>('')
+  const [registeredASA, setRegisteredASA] = useState<number>(0)
+  const [votesTotal, setVotesTotal] = useState<number>(0)
+  const [votesInFavor, setVotesInFavor] = useState<number>(0)
 
-  const getProposal = async () => {
+  const resetState = () => {
+    setRegisteredASA(0)
+    setVotesTotal(0)
+    setVotesInFavor(0)
+  }
+
+  const setState = async () => {
     try {
       const state = await typedClient.getGlobalState()
       setProposal(state.proposal!.asString())
+      setRegisteredASA(state.registeredAsaId?.asNumber() || 0)
+      setVotesTotal(state.votesTotal?.asNumber() || 0)
+      setVotesInFavor(state.votesInFavor?.asNumber() || 0)
     } catch (e) {
       console.warn(e)
       setProposal('Invalid App ID!')
+      resetState()
     }
   }
 
   useEffect(() => {
     if (appID === 0) {
       setProposal('The app ID must be set manually or via DAO creation before loading the proposal')
+      resetState()
       return
     }
 
-    getProposal()
+    setState()
   }, [appID])
 
   const { activeAddress } = useWallet()
@@ -125,6 +141,12 @@ export default function App() {
 
                 <textarea className="textarea textarea-bordered m-2" value={proposal} />
 
+                <h1 className="font-bold m-2">Votes</h1>
+
+                <p>
+                  {votesInFavor} / {votesTotal}
+                </p>
+
                 <div className="divider" />
 
                 {activeAddress && appID === 0 && (
@@ -135,6 +157,40 @@ export default function App() {
                     typedClient={typedClient}
                     setAppID={setAppID}
                   />
+                )}
+
+                {activeAddress && appID !== 0 && registeredASA !== 0 && (
+                  <DaoRegister
+                    buttonClass="btn m-2"
+                    buttonLoadingNode={<span className="loading loading-spinner" />}
+                    buttonNode="Call register"
+                    typedClient={typedClient}
+                    registeredASA={registeredASA}
+                    algodClient={algodClient}
+                  />
+                )}
+
+                {activeAddress && appID !== 0 && registeredASA !== 0 && (
+                  <div>
+                    <DaoVote
+                      buttonClass="btn m-2"
+                      buttonLoadingNode={<span className="loading loading-spinner" />}
+                      buttonNode="Vote Against"
+                      typedClient={typedClient}
+                      inFavor={false}
+                      registeredASA={registeredASA}
+                      setState={setState}
+                    />
+                    <DaoVote
+                      buttonClass="btn m-2"
+                      buttonLoadingNode={<span className="loading loading-spinner" />}
+                      buttonNode="Vote in Favor"
+                      typedClient={typedClient}
+                      inFavor={true}
+                      registeredASA={registeredASA}
+                      setState={setState}
+                    />
+                  </div>
                 )}
               </div>
 

@@ -22,6 +22,7 @@ type Props = {
   typedClient: DaoClient
   inFavor: DaoVoteArgs['inFavor']
   registeredASA: DaoVoteArgs['registeredASA']
+  setState: () => Promise<void>
 }
 
 const DaoVote = (props: Props) => {
@@ -39,6 +40,7 @@ const DaoVote = (props: Props) => {
       },
       { sender },
     )
+    await props.setState()
     setLoading(false)
   }
 

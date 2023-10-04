@@ -2,6 +2,8 @@
 import { ReactNode, useState } from 'react'
 import { Dao, DaoClient } from '../contracts/DaoClient'
 import { useWallet } from '@txnlab/use-wallet'
+import algosdk from 'algosdk'
+import * as algokit from '@algorandfoundation/algokit-utils'
 
 /* Example usage
 <DaoRegister
@@ -20,6 +22,7 @@ type Props = {
   buttonNode: ReactNode
   typedClient: DaoClient
   registeredASA: DaoRegisterArgs['registeredASA']
+  algodClient: algosdk.Algodv2
 }
 
 const DaoRegister = (props: Props) => {
@@ -30,11 +33,22 @@ const DaoRegister = (props: Props) => {
   const callMethod = async () => {
     setLoading(true)
     console.log(`Calling register`)
+
+    const registeredAsaOptInTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+      from: sender.addr,
+      to: sender.addr,
+      amount: 0,
+      suggestedParams: await algokit.getTransactionParams(undefined, props.algodClient),
+      assetIndex: Number(props.registeredASA),
+    })
+
+    await algokit.sendTransaction({ from: sender, transaction: registeredAsaOptInTxn }, props.algodClient)
+
     await props.typedClient.register(
       {
         registeredASA: props.registeredASA,
       },
-      { sender },
+      { sender, sendParams: { fee: algokit.microAlgos(3_000) } },
     )
     setLoading(false)
   }
