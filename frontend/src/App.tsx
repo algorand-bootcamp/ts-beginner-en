@@ -57,7 +57,6 @@ export default function App() {
 
   const setState = async () => {
     try {
-      console.log(appID)
       const state = await typedClient.getGlobalState()
       const asa = state.registeredAsaId?.asNumber() || 0
 
