@@ -46,20 +46,33 @@ export default function App() {
   const [registeredASA, setRegisteredASA] = useState<number>(0)
   const [votesTotal, setVotesTotal] = useState<number>(0)
   const [votesInFavor, setVotesInFavor] = useState<number>(0)
+  const [registered, setRegistered] = useState<boolean>(false)
 
   const resetState = () => {
     setRegisteredASA(0)
     setVotesTotal(0)
     setVotesInFavor(0)
+    setRegistered(false)
   }
 
   const setState = async () => {
     try {
+      console.log(appID)
       const state = await typedClient.getGlobalState()
+      const asa = state.registeredAsaId?.asNumber() || 0
+
       setProposal(state.proposal!.asString())
-      setRegisteredASA(state.registeredAsaId?.asNumber() || 0)
+      setRegisteredASA(asa)
       setVotesTotal(state.votesTotal?.asNumber() || 0)
       setVotesInFavor(state.votesInFavor?.asNumber() || 0)
+
+      try {
+        const assetInfo = await algodClient.accountAssetInformation(activeAddress!, asa).do()
+        setRegistered(assetInfo['asset-holding'].amount === 1)
+      } catch (e) {
+        console.warn(e)
+        setRegistered(false)
+      }
     } catch (e) {
       console.warn(e)
       setProposal('Invalid App ID!')
@@ -159,7 +172,7 @@ export default function App() {
                   />
                 )}
 
-                {activeAddress && appID !== 0 && registeredASA !== 0 && (
+                {activeAddress && appID !== 0 && registeredASA !== 0 && !registered && (
                   <DaoRegister
                     buttonClass="btn m-2"
                     buttonLoadingNode={<span className="loading loading-spinner" />}
@@ -167,10 +180,11 @@ export default function App() {
                     typedClient={typedClient}
                     registeredASA={registeredASA}
                     algodClient={algodClient}
+                    setState={setState}
                   />
                 )}
 
-                {activeAddress && appID !== 0 && registeredASA !== 0 && (
+                {activeAddress && appID !== 0 && registeredASA !== 0 && registered && (
                   <div>
                     <DaoVote
                       buttonClass="btn m-2"

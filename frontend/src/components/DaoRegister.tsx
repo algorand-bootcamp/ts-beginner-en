@@ -23,6 +23,7 @@ type Props = {
   typedClient: DaoClient
   registeredASA: DaoRegisterArgs['registeredASA']
   algodClient: algosdk.Algodv2
+  setState: () => Promise<void>
 }
 
 const DaoRegister = (props: Props) => {
@@ -50,6 +51,8 @@ const DaoRegister = (props: Props) => {
       },
       { sender, sendParams: { fee: algokit.microAlgos(3_000) } },
     )
+
+    await props.setState()
     setLoading(false)
   }
 
