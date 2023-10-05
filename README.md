@@ -14,6 +14,13 @@ To go to each step, run the command `git checkout vXXX` with `XXX` corresponding
 4. v104
 5. v105
 6. v106
+7. v107
+8. v108
+9. v109
+10. v110
+11. v111
+12. v112
+13. v113
 
 It is recommended to start with step `v101`, so get started with `git checkout v101`
 
