@@ -25,5 +25,5 @@ If you wish to clone the repo locally but still use a devcontainer, simply repla
 ## Video Recordings
 - Episode #1 [AlgoKit – your window into Web3 using TEALScript](https://youtu.be/jMrCtkwlw_M)
 - Episode #2 [Implementing DAO smart contract logic using TEALScript](https://youtu.be/J1NYgKdmXHw)
-- Episode #3 [Interactions: Frontend Development w/ React](https://youtu.be/3gTvBOy-c-0)
-- Episode #4 [Refining the UI, Testing & Debugging]
+- Episode #3 [Refactoring DAO & initializing React front-end UI](https://youtu.be/3gTvBOy-c-0)
+- Episode #4 [Adding AlgoKit generated React components to DAO UI]
