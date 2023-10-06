@@ -9,6 +9,11 @@
           "name": "proposal",
           "type": "string",
           "desc": ""
+        },
+        {
+          "name": "endVoting",
+          "type": "uint64",
+          "desc": ""
         }
       ],
       "desc": "",

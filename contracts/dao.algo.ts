@@ -8,14 +8,17 @@ class Dao extends Contract {
 
   proposal = GlobalStateKey<string>({ key: 'p' });
 
+  endVoting = GlobalStateKey<number>();
+
   votesTotal = GlobalStateKey<number>();
 
   votesInFavor = GlobalStateKey<number>();
 
   inFavor = BoxMap<Address, boolean>();
 
-  createApplication(proposal: string): void {
+  createApplication(proposal: string, endVoting: number): void {
     this.proposal.value = proposal;
+    this.endVoting.value = endVoting;
   }
 
   bootstrap(): Asset {
@@ -34,6 +37,7 @@ class Dao extends Contract {
 
   // eslint-disable-next-line no-unused-vars
   register(boxMbr: PayTxn, registeredASA: Asset): void {
+    assert(globals.latestTimestamp < this.endVoting.value);
     verifyTxn(boxMbr, {
       receiver: this.app.address,
       amount: USER_BOX_MBR,
@@ -80,6 +84,7 @@ class Dao extends Contract {
 
   // eslint-disable-next-line no-unused-vars
   vote(inFavor: boolean, registeredASA: Asset): void {
+    assert(globals.latestTimestamp < this.endVoting.value);
     assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 1);
     assert(!this.inFavor(this.txn.sender).exists);
     this.inFavor(this.txn.sender).value = inFavor;
