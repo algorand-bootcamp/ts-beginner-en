@@ -15,6 +15,7 @@ describe('Dao', () => {
   let sender: algosdk.Account;
   let other: algosdk.Account;
   const proposal = 'This is a proposal.';
+  const boxMbrIncrease = 15_700;
   let registeredASA: bigint;
   beforeEach(fixture.beforeEach);
 
@@ -84,6 +85,8 @@ describe('Dao', () => {
   });
 
   test('register', async () => {
+    const appReference = await appClient.appClient.getAppReference();
+
     const registeredAsaOptInTxn = makeAssetTransferTxnWithSuggestedParams(
       sender.addr,
       sender.addr,
@@ -97,7 +100,15 @@ describe('Dao', () => {
     await algod.sendRawTransaction(registeredAsaOptInTxn.signTxn(sender.sk)).do();
     await algosdk.waitForConfirmation(algod, registeredAsaOptInTxn.txID(), 1);
 
-    await appClient.optIn.register({ registeredASA }, {
+    const boxMbr = algosdk.makePaymentTxnWithSuggestedParams(
+      sender.addr,
+      appReference.appAddress,
+      boxMbrIncrease,
+      undefined,
+      undefined,
+      await algod.getTransactionParams().do(),
+    );
+    await appClient.register({ boxMbr, registeredASA }, {
       sender,
       sendParams: {
         fee: microAlgos(3_000),
@@ -124,12 +135,26 @@ describe('Dao', () => {
   });
 
   test('vote & getVotes', async () => {
-    await appClient.vote({ inFavor: true, registeredASA }, { sender });
+    const appReference = await appClient.appClient.getAppReference();
+
+    await appClient.vote(
+      { inFavor: true, registeredASA },
+      {
+        sender,
+        boxes: [{ appId: appReference.appId, name: algosdk.decodeAddress(sender.addr).publicKey }],
+      },
+    );
 
     const votesAfter = await appClient.getVotes({});
     expect(votesAfter.return?.valueOf()).toEqual([BigInt(1), BigInt(1)]);
 
-    await expect(appClient.vote({ inFavor: false, registeredASA }, { sender }))
+    await expect(appClient.vote(
+      { inFavor: false, registeredASA },
+      {
+        sender,
+        boxes: [{ appId: appReference.appId, name: algosdk.decodeAddress(sender.addr).publicKey }],
+      },
+    ))
       .rejects
       .toThrow();
 
@@ -138,12 +163,15 @@ describe('Dao', () => {
   });
 
   test('deregister', async () => {
-    await appClient.closeOut.deregister(
+    const appReference = await appClient.appClient.getAppReference();
+
+    await appClient.deregister(
       { registeredASA },
       {
         sender,
+        boxes: [{ appId: appReference.appId, name: algosdk.decodeAddress(sender.addr).publicKey }],
         sendParams: {
-          fee: microAlgos(2_000),
+          fee: microAlgos(3_000),
         },
       },
     );
@@ -177,36 +205,34 @@ describe('Dao', () => {
     await algod.sendRawTransaction(registeredAsaOptInTxn.signTxn(sender.sk)).do();
     await algosdk.waitForConfirmation(algod, registeredAsaOptInTxn.txID(), 1);
 
-    await appClient.optIn.register({ registeredASA }, {
+    const boxMbr = algosdk.makePaymentTxnWithSuggestedParams(
+      sender.addr,
+      appReference.appAddress,
+      boxMbrIncrease,
+      undefined,
+      undefined,
+      await algod.getTransactionParams().do(),
+    );
+    await appClient.register({ boxMbr, registeredASA }, {
       sender,
       sendParams: {
         fee: microAlgos(3_000),
       },
     });
 
-    await appClient.vote({ inFavor: false, registeredASA }, { sender });
+    await appClient.vote(
+      { inFavor: false, registeredASA },
+      {
+        sender,
+        boxes: [{ appId: appReference.appId, name: algosdk.decodeAddress(sender.addr).publicKey }],
+      },
+    );
 
     const votesAfter2 = await appClient.getVotes({});
     expect(votesAfter2.return?.valueOf()).toEqual([BigInt(1), BigInt(0)]);
   });
 
   test('clearState', async () => {
-    await appClient.clearState({ sender });
-
-    const votesAfter = await appClient.getVotes({});
-    expect(votesAfter.return?.valueOf()).toEqual([BigInt(0), BigInt(0)]);
-
-    await expect(appClient.vote({ inFavor: true, registeredASA }, { sender }))
-      .rejects
-      .toThrow();
-
-    await expect(appClient.optIn.register({ registeredASA }, {
-      sender,
-      sendParams: {
-        fee: microAlgos(3_000),
-      },
-    }))
-      .rejects
-      .toThrow();
+    await expect(appClient.clearState({ sender })).rejects.toThrow();
   });
 });

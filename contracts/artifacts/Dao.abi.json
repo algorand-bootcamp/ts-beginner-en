@@ -30,6 +30,11 @@
       "name": "register",
       "args": [
         {
+          "name": "boxMbr",
+          "type": "pay",
+          "desc": ""
+        },
+        {
           "name": "registeredASA",
           "type": "asset",
           "desc": ""

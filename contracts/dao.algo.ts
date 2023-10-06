@@ -1,5 +1,7 @@
 import { Contract } from '@algorandfoundation/tealscript';
 
+const USER_BOX_MBR = 2_500 + 400 * 33;
+
 // eslint-disable-next-line no-unused-vars
 class Dao extends Contract {
   registeredAsaId = GlobalStateKey<Asset>();
@@ -10,7 +12,7 @@ class Dao extends Contract {
 
   votesInFavor = GlobalStateKey<number>();
 
-  inFavor = LocalStateKey<boolean>();
+  inFavor = BoxMap<Address, boolean>();
 
   createApplication(proposal: string): void {
     this.proposal.value = proposal;
@@ -30,9 +32,12 @@ class Dao extends Contract {
     return registeredAsa;
   }
 
-  @allow.call('OptIn')
   // eslint-disable-next-line no-unused-vars
-  register(registeredASA: Asset): void {
+  register(boxMbr: PayTxn, registeredASA: Asset): void {
+    verifyTxn(boxMbr, {
+      receiver: this.app.address,
+      amount: USER_BOX_MBR,
+    });
     assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 0);
     sendAssetTransfer({
       xferAsset: this.registeredAsaId.value,
@@ -48,16 +53,6 @@ class Dao extends Contract {
     });
   }
 
-  private forgetVote(): void {
-    if (this.inFavor(this.txn.sender).exists) {
-      this.votesTotal.value = this.votesTotal.value - 1;
-      if (this.inFavor(this.txn.sender).value) {
-        this.votesInFavor.value = this.votesInFavor.value - 1;
-      }
-    }
-  }
-
-  @allow.call('CloseOut')
   // eslint-disable-next-line no-unused-vars
   deregister(registeredASA: Asset): void {
     assert(this.txn.sender.assetBalance(this.registeredAsaId.value) === 1);
@@ -68,11 +63,19 @@ class Dao extends Contract {
       assetAmount: 1,
       fee: 0,
     });
-    this.forgetVote();
-  }
 
-  clearState(): void {
-    this.forgetVote();
+    if (this.inFavor(this.txn.sender).exists) {
+      this.votesTotal.value = this.votesTotal.value - 1;
+      if (this.inFavor(this.txn.sender).value) {
+        this.votesInFavor.value = this.votesInFavor.value - 1;
+      }
+      this.inFavor(this.txn.sender).delete();
+    }
+    sendPayment({
+      receiver: this.txn.sender,
+      amount: USER_BOX_MBR,
+      fee: 0,
+    });
   }
 
   // eslint-disable-next-line no-unused-vars
